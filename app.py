@@ -38,10 +38,9 @@ HEADERS_TEMPLATE = {
 # ===== AES ENCRYPT =====
 def encrypt_message(key, iv, plaintext):
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    padded = pad(plaintext, AES.block_size)
-    return cipher.encrypt(padded)
+    return cipher.encrypt(pad(plaintext, AES.block_size))
 
-# ===== JWT DECODE =====
+# ===== JWT DECODE (ONLY UID USE) =====
 def decode_jwt(token):
     try:
         payload = token.split(".")[1]
@@ -49,27 +48,37 @@ def decode_jwt(token):
         decoded = base64.urlsafe_b64decode(payload)
         data = json.loads(decoded)
 
-        name = data.get("nickname", "Unknown")
         uid = data.get("account_id", "Unknown")
-        region = data.get("noti_region", "Unknown")
-        version = data.get("release_version", "Unknown")
-        exp = data.get("exp", 0)
+        region = data.get("noti_region", "OTHER")
 
-        if exp:
-            expire_time = datetime.fromtimestamp(exp).strftime("%d %b %Y %I:%M %p")
-            remaining = int(exp - time.time())
-            hours = remaining // 3600
-            minutes = (remaining % 3600) // 60
-            remaining_text = f"{hours}h {minutes}m left"
-        else:
-            expire_time = "Unknown"
-            remaining_text = "Unknown"
-
-        return name, uid, region, version, expire_time, remaining_text
+        return uid, region
 
     except Exception as e:
         print("JWT decode error:", e)
-        return "Unknown", "Unknown", "Unknown", "Unknown", "Unknown", "Unknown"
+        return "Unknown", "OTHER"
+
+
+# ===== REAL PLAYER INFO API =====
+def get_player_info(uid):
+    try:
+        url = f"https://sextyinfo-cyan.vercel.app/player-info?uid={uid}"
+        r = session.get(url, timeout=10)
+        data = r.json()
+
+        # try multiple possible keys
+        nickname = (
+            data.get("nickname")
+            or data.get("name")
+            or data.get("player_name")
+            or "Unknown"
+        )
+
+        return nickname
+
+    except Exception as e:
+        print("Player info error:", e)
+        return "Unknown"
+
 
 # ================= SEND BIO =================
 @app.route('/send_bio', methods=['GET'])
@@ -84,14 +93,17 @@ def send_bio():
                 "message": "Missing token or bio"
             }), 400
 
-        # ===== Decode JWT info =====
-        name, uid, region, version, expire_time, remaining = decode_jwt(token)
+        # ===== GET UID + REGION =====
+        uid, region = decode_jwt(token)
 
-        # ===== SELECT API BASED ON REGION =====
-        region = region.upper()  # Ensure region is uppercase
+        # ===== GET REAL NICKNAME =====
+        name = get_player_info(uid)
+
+        # ===== SELECT API =====
+        region = region.upper()
         DATA_API = REGION_APIS.get(region, REGION_APIS["OTHER"])
 
-        # ===== Protobuf =====
+        # ===== PROTOBUF =====
         message = my_pb2.Signature()
         message.field2 = 9
         message.field8 = bio
@@ -106,7 +118,7 @@ def send_bio():
         headers = HEADERS_TEMPLATE.copy()
         headers["Authorization"] = f"Bearer {token}"
 
-        # ===== Update Bio =====
+        # ===== SEND REQUEST =====
         response = session.post(
             DATA_API,
             data=encrypted,
@@ -115,7 +127,6 @@ def send_bio():
             timeout=15
         )
 
-        # ===== REAL STATUS CHECK =====
         if response.status_code != 200:
             return jsonify({
                 "status": "error",
@@ -131,9 +142,7 @@ def send_bio():
             "nickname": name,
             "region": region,
             "uid": uid,
-            "release_version": version,
-            "token_expire": expire_time,
-            "remaining_time": remaining,
+            "release_version": "OB53",
             "new_bio": bio,
             "api_used": DATA_API,
             "response_status_code": response.status_code,
@@ -146,6 +155,7 @@ def send_bio():
             "status": "error",
             "message": str(e)
         })
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
