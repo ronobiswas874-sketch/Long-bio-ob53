@@ -132,6 +132,7 @@ def send_bio():
         if response.status_code != 200:
             return jsonify({
                 "status": "error",
+                "color": "red",
                 "message": "JWT TOKEN INVALID PLEASE CHECK YOUR JWT TOKEN",
                 "code": response.status_code
             })
