@@ -146,7 +146,7 @@ def send_bio():
             "uid": uid,
             "release_version": "OB53",
             "new_bio": bio,
-            "api_used": DATA_API,
+            "api_owner": "XEROX_MOD",
             "response_status_code": response.status_code,
             "response_text": response.text
         })
