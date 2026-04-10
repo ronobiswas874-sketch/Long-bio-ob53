@@ -65,19 +65,16 @@ def get_player_info(uid):
         r = session.get(url, timeout=10)
         data = r.json()
 
-        # try multiple possible keys
-        nickname = (
-            data.get("nickname")
-            or data.get("name")
-            or data.get("player_name")
-            or "Unknown"
-        )
+        # ✅ correct nested extraction
+        p = data.get("basicInfo", {})
+        player_name = p.get("nickname", "Unknown Player")
 
-        return nickname
+        return player_name
 
     except Exception as e:
         print("Player info error:", e)
-        return "Unknown"
+        return "Unknown Player"
+
 
 
 # ================= SEND BIO =================
