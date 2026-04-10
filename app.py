@@ -132,7 +132,7 @@ def send_bio():
         if response.status_code != 200:
             return jsonify({
                 "status": "error",
-                "message": "Game API request failed",
+                "message": "JWT TOKEN INVALID PLEASE CHECK YOUR JWT TOKEN",
                 "code": response.status_code
             })
 
