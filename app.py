@@ -62,7 +62,7 @@ def decode_jwt(token):
 def get_player_info(uid):
     try:
         url = f"https://sextyinfo-cyan.vercel.app/player-info?uid={uid}"
-        r = session.get(url, timeout=10)
+        r = session.get(url, timeout=50)
         data = r.json()
 
         # ✅ correct nested extraction
