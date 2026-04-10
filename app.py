@@ -160,5 +160,35 @@ def send_bio():
         })
 
 
+@app.route('/')
+def home():
+    return """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Bio UI</title>
+</head>
+<body>
+
+<h2 id="msg">Loading...</h2>
+
+<script>
+fetch("/send_bio?token=xxx&bio=test")
+.then(r => r.json())
+.then(data => {
+    const msg = document.getElementById("msg");
+
+    msg.innerText = data.message || data.status;
+
+    if (data.color) {
+        msg.style.color = data.color;
+    }
+});
+</script>
+
+</body>
+</html>
+"""
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
