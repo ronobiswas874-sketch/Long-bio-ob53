@@ -92,20 +92,16 @@ def send_bio():
         if not token or not bio:
             return jsonify({
                 "status": "error",
+                "color": "red",
                 "message": "Missing token or bio"
             }), 400
 
-        # ===== GET UID + REGION =====
         uid, region = decode_jwt(token)
-
-        # ===== GET REAL NICKNAME =====
         name = get_player_info(uid)
 
-        # ===== SELECT API =====
-        region = region.upper()
+        region = (region or "OTHER").upper()
         DATA_API = REGION_APIS.get(region, REGION_APIS["OTHER"])
 
-        # ===== PROTOBUF =====
         message = my_pb2.Signature()
         message.field2 = 9
         message.field8 = bio
@@ -120,7 +116,6 @@ def send_bio():
         headers = HEADERS_TEMPLATE.copy()
         headers["Authorization"] = f"Bearer {token}"
 
-        # ===== SEND REQUEST =====
         response = session.post(
             DATA_API,
             data=encrypted,
@@ -128,6 +123,8 @@ def send_bio():
             verify=False,
             timeout=15
         )
+
+        now = datetime.now().strftime("%H:%M:%S %d/%m/%Y")
 
         if response.status_code != 200:
             return jsonify({
@@ -137,28 +134,22 @@ def send_bio():
                 "code": response.status_code
             })
 
-        now = datetime.now().strftime("%H:%M:%S %d/%m/%Y")
-
         return jsonify({
             "status": "success",
+            "color": "green",
             "time": now,
             "nickname": name,
             "region": region,
             "uid": uid,
-            "release_version": "OB53",
-            "new_bio": bio,
-            "api_owner": "XEROX_MOD",
-            "response_status_code": response.status_code,
-            "response_text": response.text
+            "new_bio": bio
         })
 
     except Exception as e:
-        traceback.print_exc()
         return jsonify({
             "status": "error",
+            "color": "red",
             "message": str(e)
         })
-
 
 @app.route('/')
 def home():
@@ -166,7 +157,7 @@ def home():
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Send Bio UI</title>
+    <title>Send Bio Panel</title>
 </head>
 <body>
 
@@ -174,14 +165,20 @@ def home():
 
 <script>
 fetch("/send_bio?token=xxx&bio=test")
-.then(r => r.json())
+.then(res => res.json())
 .then(data => {
+
     const msg = document.getElementById("msg");
 
     msg.innerText = data.message || data.status;
 
-    if (data.color) {
-        msg.style.color = data.color;
+    // 🔥 REAL COLOR APPLY
+    if (data.color === "red") {
+        msg.style.color = "red";
+    }
+
+    if (data.color === "green") {
+        msg.style.color = "green";
     }
 });
 </script>
