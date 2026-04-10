@@ -62,14 +62,19 @@ def decode_jwt(token):
 def get_player_info(uid):
     try:
         url = f"https://sextyinfo-cyan.vercel.app/player-info?uid={uid}"
-        r = session.get(url, timeout=50)
+        r = session.get(url, timeout=10)
         data = r.json()
 
-        # ✅ correct nested extraction
-        p = data.get("basicInfo", {})
-        player_name = p.get("nickname", "Unknown Player")
+        # ✅ correct path (your real response)
+        nickname = (
+            data.get("basicInfo", {}).get("nickname")
+        )
 
-        return player_name
+        # safety fallback (optional)
+        if not nickname:
+            nickname = "Unknown Player"
+
+        return nickname
 
     except Exception as e:
         print("Player info error:", e)
