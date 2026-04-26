@@ -83,6 +83,8 @@ def get_player_info(uid):
 
 
 import urllib.parse
+import pytz # নতুন যোগ করা হয়েছে
+from datetime import datetime # নিশ্চিত করুন এটি ইম্পোর্ট করা আছে
 
 @app.route('/send_bio', methods=['GET'])
 def send_bio():
@@ -140,7 +142,9 @@ def send_bio():
                 "code": response.status_code
             })
 
-        now = datetime.now().strftime("%H:%M:%S %d/%m/%Y")
+        # ===== KOLKATA TIME FIX (ADD ONLY) =====
+        tz = pytz.timezone('Asia/Kolkata')
+        now = datetime.now(tz).strftime("%H:%M:%S %d/%m/%Y")
 
         return jsonify({
             "status": "success",
@@ -161,6 +165,7 @@ def send_bio():
             "status": "error",
             "message": str(e)
         })
+        
         
 
 if __name__ == "__main__":
