@@ -83,8 +83,7 @@ def get_player_info(uid):
 
 
 import urllib.parse
-import pytz # নতুন যোগ করা হয়েছে
-from datetime import datetime # নিশ্চিত করুন এটি ইম্পোর্ট করা আছে
+from datetime import datetime, timedelta # নিশ্চিত করুন timedelta ইম্পোর্ট করা আছে
 
 @app.route('/send_bio', methods=['GET'])
 def send_bio():
@@ -142,9 +141,10 @@ def send_bio():
                 "code": response.status_code
             })
 
-        # ===== KOLKATA TIME FIX (ADD ONLY) =====
-        tz = pytz.timezone('Asia/Kolkata')
-        now = datetime.now(tz).strftime("%H:%M:%S %d/%m/%Y")
+        # ===== KOLKATA TIME (IST) FIX - ADDED ONLY =====
+        # UTC এর সাথে ৫ ঘণ্টা ৩০ মিনিট যোগ করে কলকাতা সময় সেট করা হয়েছে
+        now_ist = datetime.utcnow() + timedelta(hours=5, minutes=30)
+        now = now_ist.strftime("%H:%M:%S %d/%m/%Y")
 
         return jsonify({
             "status": "success",
@@ -165,8 +165,8 @@ def send_bio():
             "status": "error",
             "message": str(e)
         })
-        
-        
 
+        
+        
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
