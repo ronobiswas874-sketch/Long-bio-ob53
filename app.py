@@ -82,7 +82,8 @@ def get_player_info(uid):
 
 
 
-# ================= SEND BIO =================
+import urllib.parse
+
 @app.route('/send_bio', methods=['GET'])
 def send_bio():
     try:
@@ -94,6 +95,9 @@ def send_bio():
                 "status": "error",
                 "message": "Missing token or bio"
             }), 400
+
+        # Decode the bio to handle any encoded spaces
+        bio = urllib.parse.unquote_plus(bio)
 
         # ===== GET UID + REGION =====
         uid, region = decode_jwt(token)
@@ -157,7 +161,7 @@ def send_bio():
             "status": "error",
             "message": str(e)
         })
-
+        
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
