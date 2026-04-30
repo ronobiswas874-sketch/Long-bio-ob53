@@ -19,7 +19,7 @@ REGION_APIS = {
     "BR": "https://clientbp.ggpolarbear.com/UpdateSocialBasicInfo",
     "US": "https://client.us.freefiremobile.com/UpdateSocialBasicInfo",
     "SAC": "https://clientbp.ggpolarbear.com/UpdateSocialBasicInfo",
-    "NA": "https://client.na.freefiremobile.com/UpdateSocialBasicInfo",
+    "NA": "https://client.us.freefiremobile.com/UpdateSocialBasicInfo",
     "OTHER": "https://clientbp.ggpolarbear.com/UpdateSocialBasicInfo"
 }
 
