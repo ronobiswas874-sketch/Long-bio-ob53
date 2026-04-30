@@ -61,8 +61,8 @@ def decode_jwt(token):
 # ===== REAL PLAYER INFO API =====
 def get_player_info(uid):
     try:
-        url = f"https://sextyinfo-cyan.vercel.app/player-info?uid={uid}"
-        r = session.get(url, timeout=10)
+        url = f"https://player-info-ob53.vercel.app/player-info?uid={uid}"
+        r = session.get(url, timeout=60)
         data = r.json()
 
         # ✅ correct path (your real response)
