@@ -72,7 +72,7 @@ def get_player_info(uid):
 
         # safety fallback (optional)
         if not nickname:
-            nickname = "Unknown Player"
+            nickname = "Unknown"
 
         return nickname
 
