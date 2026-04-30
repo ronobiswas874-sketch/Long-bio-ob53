@@ -16,11 +16,11 @@ session = requests.Session()
 # ===== REGION BASED API =====
 REGION_APIS = {
     "IND": "https://client.ind.freefiremobile.com/UpdateSocialBasicInfo",
-    "BR": "https://client.br.freefiremobile.com/UpdateSocialBasicInfo",
+    "BR": "https://clientbp.ggpolarbear.com/UpdateSocialBasicInfo",
     "US": "https://client.us.freefiremobile.com/UpdateSocialBasicInfo",
-    "SAC": "https://client.sac.freefiremobile.com/UpdateSocialBasicInfo",
+    "SAC": "https://clientbp.ggpolarbear.com/UpdateSocialBasicInfo",
     "NA": "https://client.na.freefiremobile.com/UpdateSocialBasicInfo",
-    "OTHER": "https://clientbp.ggblueshark.com/UpdateSocialBasicInfo"
+    "OTHER": "https://clientbp.ggpolarbear.com/UpdateSocialBasicInfo"
 }
 
 # ===== OB52 HEADERS =====
